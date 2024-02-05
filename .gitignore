@@ -6,3 +6,6 @@
 /.idea/pdf-invoices.iml
 /.idea/inspectionProfiles/profiles_settings.xml
 /.idea/vcs.xml
+/input/
+/output/
+/.idea/inspectionProfiles/Project_Default.xml
