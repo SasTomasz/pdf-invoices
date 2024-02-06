@@ -6,11 +6,14 @@ from fpdf import FPDF
 
 
 def add_cell(product_id, product_name, amount, price, total_price):
-    pdf.cell(30, 10, product_id, 1, 0)
-    pdf.cell(70, 10, product_name, 1, 0)
-    pdf.cell(30, 10, amount, 1, 0)
-    pdf.cell(30, 10, price, 1, 0)
-    pdf.cell(30, 10, total_price, 1, 1)
+    args = locals()
+    for i in args.items():
+        if i[0] == "product_name":
+            pdf.cell(70, 10, i[1], 1, 0)
+        elif i[0] == "total_price":
+            pdf.cell(30, 10, i[1], 1, 1)
+        else:
+            pdf.cell(30, 10, i[1], 1, 0)
 
 
 files = os.listdir("./input")
@@ -24,7 +27,7 @@ for f in files:
     col_amount = "Amount"
     col_price = "Price per Unit"
     col_total_price = "Total Price"
-    title = "Invoice nr. 10001"
+    title = f"Invoice nr {f.split('-', 1)[0]}"
     date = f"Date {generate_date}"
     total_price_value = 0
 
