@@ -1,5 +1,6 @@
-import os
+from glob import glob
 from datetime import datetime
+from pathlib import Path
 
 import pandas as pd
 from fpdf import FPDF
@@ -16,10 +17,10 @@ def add_cell(product_id, product_name, amount, price, total_price):
             pdf.cell(30, 10, i[1], 1, 0)
 
 
-files = os.listdir("./input")
+files = glob("./input/*xlsx")
 for f in files:
-    df = pd.read_excel(f"./input/{f}")
-    number_and_date = f.split("-")
+    df = pd.read_excel(f)
+    number_and_date = Path(f).stem.split("-")
 
     generate_date = datetime.now().strftime("%Y.%m.%d")
     pdf = FPDF()
@@ -38,7 +39,7 @@ for f in files:
     pdf.set_font("Times", "B", 22)
     pdf.cell(0, 10, title, 0, 1)
     pdf.cell(0, 10, label_generate_date, ln=1)
-    pdf.cell(0, 10, label_document_date.strip(".xlsx"), ln=1)
+    pdf.cell(0, 10, label_document_date, ln=1)
     pdf.ln()
     pdf.set_font("Times", "B", 12)
     add_cell(col_product_id, col_product_name, col_amount, col_price, col_total_price)
@@ -60,9 +61,5 @@ for f in files:
     summary = f"The total due amount is {total_price_value} Euros"
     pdf.cell(0, 10, summary, 0, 1)
 
-    file_name = f.strip(".xlsx") + ".pdf"
+    file_name = str(Path(f).stem) + ".pdf"
     pdf.output(f"./output/{file_name}")
-
-# TODO:
-#  * Use pathlib and glob
-
