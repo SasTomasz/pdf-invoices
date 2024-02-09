@@ -7,31 +7,29 @@ from fpdf import FPDF
 
 
 def add_cell(product_id, product_name, amount, price, total_price):
-    args = locals()
-    for i in args.items():
-        if i[0] == "product_name":
-            pdf.cell(70, 10, i[1], 1, 0)
-        elif i[0] == "total_price":
-            pdf.cell(30, 10, i[1], 1, 1)
-        else:
-            pdf.cell(30, 10, i[1], 1, 0)
+    pdf.cell(20, 10, product_id, 1, 0)
+    pdf.cell(60, 10, product_name, 1, 0)
+    pdf.cell(35, 10, amount, 1, 0)
+    pdf.cell(30, 10, price, 1, 0)
+    pdf.cell(30, 10, total_price, 1, 1)
 
 
 files = glob("./input/*xlsx")
 for f in files:
     df = pd.read_excel(f)
-    number_and_date = Path(f).stem.split("-")
+    invoice_number, invoice_date = Path(f).stem.split("-")
+    columns = df.columns
 
     generate_date = datetime.now().strftime("%Y.%m.%d")
     pdf = FPDF()
-    col_product_id = "Product ID"
-    col_product_name = "Product Name"
-    col_amount = "Amount"
-    col_price = "Price per Unit"
-    col_total_price = "Total Price"
-    title = f"Invoice nr {number_and_date[0]}"
+    col_product_id = str(columns[0]).replace("_", " ").title()
+    col_product_name = str(columns[1]).replace("_", " ").title()
+    col_amount = str(columns[2]).replace("_", " ").title()
+    col_price = str(columns[3]).replace("_", " ").title()
+    col_total_price = str(columns[4]).replace("_", " ").title()
+    title = f"Invoice nr {invoice_number}"
     label_generate_date = f"Date of generate: {generate_date}"
-    label_document_date = f"Document Date: {number_and_date[1]}"
+    label_document_date = f"Document Date: {invoice_date}"
     total_price_value = 0
 
     # Draw a pdf
@@ -41,9 +39,9 @@ for f in files:
     pdf.cell(0, 10, label_generate_date, ln=1)
     pdf.cell(0, 10, label_document_date, ln=1)
     pdf.ln()
-    pdf.set_font("Times", "B", 12)
+    pdf.set_font("Times", "B", 10)
     add_cell(col_product_id, col_product_name, col_amount, col_price, col_total_price)
-    pdf.set_font("Times", "", 12)
+    pdf.set_font("Times", "", 10)
 
     for index, row in df.iterrows():
         col_product_id = str(row['product_id'])
@@ -51,9 +49,9 @@ for f in files:
         col_amount = str(row['amount_purchased'])
         col_price = str(row['price_per_unit'])
         col_total_price = str(row['total_price'])
-        total_price_value += row['total_price']
         add_cell(col_product_id, col_product_name, col_amount, col_price, col_total_price)
 
+    total_price_value = sum(df['total_price'])
     add_cell("", "", "", "", str(total_price_value))
 
     pdf.set_font("Times", "B", 12)
